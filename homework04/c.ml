@@ -98,11 +98,49 @@ exception UndefinedSemantics
 (* if the following variable is set true, gc will work (otherwise, gc simply returns a given memory). *)
 let remove_garbage = ref false 
 
+
+let rec searchEnv env gcedmem rootmem  = (*환경에서 한번 메모리를 탐색하는 함수*)
+	match env with
+	| [] -> gcedmem
+	| (variable,loc)::tl -> 
+		let val1 = apply_mem rootmem loc in
+			let gcedmem' = (loc,val1)::gcedmem in searchEnv tl gcedmem' rootmem  (*이러면 환경은 한번 탐색 되었기 떄문에 조건1 만족*)
+
+let rec gcCollection envSearchedMem rootmem =
+	let search = searchMemVal envSearchedMem envSearchedMem  rootmem in
+		if (List.length search) = (List.length envSearchedMem) 
+			then search
+			else gcCollection search rootmem
+
+and searchMemVal resultmem gcedmem rootmem = 
+	match gcedmem with 
+	| [] -> resultmem
+	| (loc,value)::tl ->
+		( match value with 
+			| Int n -> searchMemVal resultmem tl rootmem
+			| Bool b -> searchMemVal resultmem tl rootmem
+			| Unit -> searchMemVal resultmem tl rootmem
+			| Procedure (varList , e1 ,env) -> searchMemVal resultmem tl rootmem
+			| Loc l -> 
+					let val1 = (apply_mem rootmem l) in 
+						let resultmem' = ((value2int value),val1)::resultmem in searchMemVal resultmem' tl rootmem
+			| Record l ->
+				let recordmem = setLocListTomem l rootmem [] in
+					let resultmem' = recordmem@resultmem in searchMemVal resultmem' tl rootmem
+			)
+and setLocListTomem locList rootmem result =
+	match locList with 
+	| [] -> result
+	| (variable,location)::tl -> let val1 = apply_mem rootmem location in 
+		let result' = (location,val1)::result  in setLocListTomem tl rootmem result
+
+
 let gc: env * mem -> mem
 = fun (env, mem) ->
 	if (not !remove_garbage) then mem 
 	else 
-		raise NotImplemented (* TODO *)
+		let envSearchedMem = searchEnv env [] mem in gcCollection envSearchedMem mem
+
 
 let rec eval : program -> env -> mem -> (value * mem)
 =fun pgm env mem ->  
