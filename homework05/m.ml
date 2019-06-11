@@ -52,7 +52,7 @@ module Subst = struct
 
   (* walk through the type, replacing each type variable by its binding in the substitution *)
   let rec apply : typ -> t -> typ
-  =fun typ subst ->
+  = fun typ subst ->
     match typ with
     | TyInt -> TyInt
     | TyBool -> TyBool 
@@ -66,7 +66,7 @@ module Subst = struct
     (tv,ty) :: (List.map (fun (x,t) -> (x, apply t [(tv,ty)])) subst)
 
   let print : t -> unit
-  =fun subst -> 
+  = fun subst -> 
       List.iter (fun (x,ty) -> print_endline (x ^ " |-> " ^ string_of_type ty)) subst
 end
 
@@ -76,16 +76,50 @@ let tyvar_num = ref 0
 let fresh_tyvar () = (tyvar_num := !tyvar_num + 1; (TyVar ("t" ^ string_of_int !tyvar_num)))
 
 let rec gen_equations : TEnv.t -> exp -> typ -> typ_eqn 
-=fun tenv e ty -> raise TypeError
+= fun tenv e ty ->
+  match e with
+    | CONST n -> [(ty,TyInt)]
+    | TRUE -> [(ty,TyBool)]
+    | FALSE ->  [(ty,TyBool)]
+    | VAR x -> 
+        let typeOfVar = (TEnv.find tenv x) in  [(ty,typeOfVar)]
+    | ADD(e1,e2) -> [(ty,TyInt)] @ (gen_equations tenv e1 TyInt) @ (gen_equations tenv e2 TyInt)
+    | SUB(e1,e2) -> [(ty,TyInt)] @ (gen_equations tenv e1 TyInt) @ (gen_equations tenv e2 TyInt)
+    | MUL(e1,e2) -> [(ty,TyInt)] @ (gen_equations tenv e1 TyInt) @ (gen_equations tenv e2 TyInt)
+    | DIV(e1,e2) -> [(ty,TyInt)] @ (gen_equations tenv e1 TyInt) @ (gen_equations tenv e2 TyInt)
+    | ISZERO e -> [(ty,TyBool)] @  (gen_equations tenv e TyBool)
+    | READ ->
+        let tyVariable = fresh_tyvar () in [(ty,tyVariable )]
+    | IF(e1,e2,e3) ->
+      let tyVariable = fresh_tyvar () in  (gen_equations tenv e1 TyBool)@ (gen_equations tenv e2 tyVariable)@ (gen_equations tenv e3 tyVariable)
+    
+    | LET (variable,e1,e2)-> 
+      let tyVariable = fresh_tyvar () in
+      let newTenv = TEnv.extend (variable,tyVariable) tenv in
+        (gen_equations tenv e1 tyVariable) @  (gen_equations newTenv e2 ty) 
+    
+      
+    | LETREC (variable1,variable2,e1,e2) -> []
+    
+    | PROC (variable,e)->
+      let tyVariable1 = fresh_tyvar () in
+      let tyVariable2 = fresh_tyvar () in
+      let newTenv = (TEnv.extend (variable,tyVariable1) tenv) in
+      [(ty, TyFun ( tyVariable1, tyVariable2) )] @ (gen_equations newTenv e tyVariable2) 
+    
+    | CALL (e1,e2) ->
+      let tyVariable = fresh_tyvar () in
+      (gen_equations tenv e1 (TyFun (tyVariable,ty)) ) @  (gen_equations tenv e2 tyVariable) 
+
 
 
 let solve : typ_eqn -> Subst.t
-=fun eqns -> raise TypeError 
+= fun eqns -> raise TypeError 
 
 
 (* typeof: Do not modify this function *)
 let typeof : exp -> typ 
-=fun exp ->
+= fun exp ->
   let new_tv = fresh_tyvar () in
   let eqns = gen_equations TEnv.empty exp new_tv in
   let _ = print_endline "= Equations = ";
