@@ -13,6 +13,6 @@ let expand: exp -> exp
 
 (* typeof: Do not modify this function *)
 let typeof : exp -> typ 
-=fun exp -> 
+= fun exp -> 
 	let exp' = expand exp in 
 	M.typeof exp'  

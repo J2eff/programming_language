@@ -136,7 +136,7 @@ t3 = int
 
 The program does not have type. Rejected.
 
-$ ./run test/exercise2.m
+$ ./run test/exercise2.m                    
 
 = Program = 
 let f = proc (z) z in 
@@ -183,7 +183,7 @@ t2 |-> bool
 Type of the given program: int
 
 
-$ ./run test/exercise4.m
+$ ./run test/exercise4.m                        
 
 = Program = 
 let f = proc (x) x in
@@ -231,7 +231,7 @@ t2 |-> int
 Type of the given program: int
 
 
-$ ./run test/poly.m
+$ ./run test/poly.m                            
 
 = Program = 
 let f = proc (x) x in
@@ -290,7 +290,7 @@ t1 = int
 
 The program does not have type. Rejected.
 
-$ ./run test/proc2.m
+$ ./run test/proc2.m                            
 
 = Program = 
 (proc (f) (f (f 77)) proc (x) (x-11))
@@ -454,7 +454,7 @@ t2 |-> int
 Type of the given program: int
 
 
-$ ./run test/proc7.m
+$ ./run test/proc7.m                          
 
 = Program = 
 let f = proc (x) (1) in (f 1) + (f true)
