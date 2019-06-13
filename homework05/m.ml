@@ -1,4 +1,3 @@
-open Str
 type program = exp
 and exp = 
 	| TRUE
@@ -183,3 +182,8 @@ let typeof : exp -> typ
       print_endline "";
       ty
   with TypeError -> (print_endline "The program does not have type. Rejected."); exit (1)
+
+
+
+
+  
