@@ -1,3 +1,7 @@
+expand (LET("x",READ,PROC("y",ADD(VAR "x",VAR "y"))))
+( LET("f",PROC("x",VAR "x") ,IF(CALL(VAR "f",(ISZERO(CONST 0)) ) , CALL(VAR "f",CONST 11),CALL(VAR "f",CONST 22))))
+
+
 $ ./run -poly test/basic1.m
 
 = Program = 
@@ -207,7 +211,7 @@ t8 |-> bool
 Type of the given program: int
 
 
-$ ./run -poly test/factorial.m
+$ ./run -poly test/factorial.m                            
 
 = Program = 
 letrec fact(n) = if iszero n then 1 else ((fact (n-1)) * n) in
@@ -300,7 +304,7 @@ t2 |-> int
 Type of the given program: int
 
 
-$ ./run -poly test/proc10.m
+$ ./run -poly test/proc10.m              error!!!!!!!!!!!!            
 
 = Program = 
 let x = iszero true in 5
@@ -340,8 +344,8 @@ t2 |-> (int -> int)
 Type of the given program: int
 
 
-$ ./run -poly test/proc3.m
-
+$ ./run -poly test/proc3.m                        
+ 
 = Program = 
 let x = 200 in
   let f = proc (z) (z-x) in
@@ -401,7 +405,7 @@ t3 |-> int
 Type of the given program: int
 
 
-$ ./run -poly test/proc5.m
+$ ./run -poly test/proc5.m                    
 
 = Program = 
 let makemult = 
@@ -443,7 +447,7 @@ t2 = int
 
 The program does not have type. Rejected.
 
-$ ./run -poly test/proc6.m
+$ ./run -poly test/proc6.m                  
 
 = Program = 
 let a = 3 in

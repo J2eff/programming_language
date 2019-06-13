@@ -508,4 +508,4 @@ The program does not have type. Rejected.
 
 
 
-t1 =  TyFun (int, TyFun (int ,t1))
+s
