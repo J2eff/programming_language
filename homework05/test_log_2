@@ -1,5 +1,5 @@
 expand (LET("x",READ,PROC("y",ADD(VAR "x",VAR "y"))))
-( LET("f",PROC("x",VAR "x") ,IF(CALL(VAR "f",(ISZERO(CONST 0)) ) , CALL(VAR "f",CONST 11),CALL(VAR "f",CONST 22))))
+expand ( LET("f",PROC("x",VAR "x") ,IF(CALL(VAR "f",(ISZERO(CONST 0)) ) , CALL(VAR "f",CONST 11),CALL(VAR "f",CONST 22))))
 
 
 $ ./run -poly test/basic1.m
@@ -304,7 +304,7 @@ t2 |-> int
 Type of the given program: int
 
 
-$ ./run -poly test/proc10.m              error!!!!!!!!!!!!            
+$ ./run -poly test/proc10.m                
 
 = Program = 
 let x = iszero true in 5
