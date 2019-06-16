@@ -119,29 +119,17 @@ let rec gen_equations : TEnv.t -> exp -> typ -> typ_eqn
       (gen_equations tenv e1 (TyFun (tyVariable,ty)) ) @  (gen_equations tenv e2 tyVariable) 
     
 
-let is_substring string substring = 
-  let ssl = String.length substring and sl = String.length string in 
-  if ssl = 0 || ssl > sl then false else 
-    let max = sl - ssl and clone = String.create ssl in
-    let rec check pos = 
-      pos <= max && (
-        String.blit string pos clone 0 ssl ; clone = substring 
-        || check (String.index_from string (succ pos) substring.[0])
-      )
-    in             
-    try check (String.index string substring.[0])
-    with Not_found -> false
 
 let rec unify t1 t2 subst =
   match (t1,t2) with
   | (TyInt,TyInt) -> subst
   | (TyBool,TyBool) -> subst
   | (TyVar x,TyVar y) ->  (Subst.extend x t2 subst)
+  | (TyVar x,TyFun(ty1,ty2) ) -> 
+      let sub' = unify ty1 ty2 [] in 
+      if(List.mem_assoc x sub') then (raise TypeError) else (Subst.extend x t2 subst)
   | (TyVar x, _) -> 
-    if (is_substring (string_of_type t2) x )
-    then
-      raise TypeError
-    else
+
       (Subst.extend x t2 subst)
 
   | (_, TyVar x) -> unify t2 t1 subst
